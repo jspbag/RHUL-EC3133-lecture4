@@ -42,16 +42,6 @@ Based on Stock and Watson, ch. 9
 
 </section>
 
-
-```{r results='asis', echo=FALSE, include=FALSE}
-library(AER) # Load Applied Econometrics with R library
-library(parameters) # Load parameters library 
-data(CASchools) # Load CASchools data
-# Generate a couple of useful variables
-CASchools$STR <- CASchools$students/CASchools$teachers  # Student-teacher ratio
-CASchools$Score <- (CASchools$read + CASchools$math)/2  # Student test score
-```
-
 # Internal and external validity
 
 ## Reliability
@@ -169,8 +159,7 @@ legend("topright", inset = 0.02,
 ## Multiple regression analysis for CA and MA
 
 ```{r, echo=TRUE, eval=TRUE, error=FALSE, warning=FALSE}
-# 6 regression models using CA data
-
+# Six regression models using CA data
 lm1.CA <- lm(Score.std ~ STR, data = CASchools)
 lm2.CA <- lm(Score.std ~ STR + english + lunch + log(income), data = CASchools)
 lm3.CA <- lm(Score.std ~ STR + english + lunch + income + 
@@ -190,8 +179,7 @@ robSE.CA <- list(sqrt(diag(vcovHC(lm1.CA, type = "HC1"))),
                  sqrt(diag(vcovHC(lm5.CA, type = "HC1"))),
                  sqrt(diag(vcovHC(lm6.CA, type = "HC1"))))
 
-# 6 regression models using MA data
-
+# Six regression models using MA data
 lm1.MA <- lm(Score.std ~ STR, data = MASchools)
 lm2.MA <- lm(Score.std ~ STR + english + lunch + log(income), data = MASchools)
 lm3.MA <- lm(Score.std ~ STR + english + lunch + income + 
@@ -210,7 +198,6 @@ robSE.MA <- list(sqrt(diag(vcovHC(lm1.MA, type = "HC1"))),
                  sqrt(diag(vcovHC(lm4.MA, type = "HC1"))),
                  sqrt(diag(vcovHC(lm5.MA, type = "HC1"))),
                  sqrt(diag(vcovHC(lm6.MA, type = "HC1"))))
-
 ```
 
 ## Multiple regression analysis for CA and MA
@@ -260,8 +247,6 @@ legend("bottomright", inset = 0.02,
 cubicregfct.lm4.CA <- function(x){lm4.CA$coefficients["STR"]*x + lm4.CA$coefficients["I(STR^2)"]*x^2 + lm4.CA$coefficients["I(STR^3)"]*x^3}
 # cubicregfct.lm4.CA(20) - cubicregfct.lm4.CA(19)
 # cubicregfct.lm4.CA(18) - cubicregfct.lm4.CA(17)
-
-
 ```
 
 
