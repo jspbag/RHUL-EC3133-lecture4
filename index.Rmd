@@ -1,0 +1,375 @@
+---
+pagetitle: Assessing studies based on multiple regression
+output: 
+  revealjs::revealjs_presentation:
+    incremental: false
+    theme: solarized
+    self_contained: false
+    # reveal_plugins: ["menu","notes","chalkboard"]
+    reveal_plugins: ["menu"]
+    highlight: pygments
+    center: true
+    transition: none
+    background_transition: none 
+    reveal_options:
+      # chalkboard:
+      #   theme: whiteboard
+      #   toggleNotesButton: true
+      #   toggleChalkboardButton: true
+      menu:
+        numbers: true
+      slideNumber: true
+      previewLinks: false
+    fig_caption: true
+    pandoc_args:
+    - --indented-code-classes
+    - lineNumbers
+    css: mystyle.css
+    
+--- 
+
+<section>
+
+<h1>Assessing studies based on multiple regression</h1>
+
+Based on Stock and Watson, ch. 9
+
+<br>
+
+<h2>[Jesper Bagger](mailto:jesper.bagger@rhul.ac.uk)</h2>
+
+<h3>EC3133 | Royal Holloway | 2020/21</h3>
+
+</section>
+
+
+```{r results='asis', echo=FALSE, include=FALSE}
+library(AER) # Load Applied Econometrics with R library
+library(parameters) # Load parameters library 
+data(CASchools) # Load CASchools data
+# Generate a couple of useful variables
+CASchools$STR <- CASchools$students/CASchools$teachers  # Student-teacher ratio
+CASchools$Score <- (CASchools$read + CASchools$math)/2  # Student test score
+```
+
+# Internal and external validity
+
+## Reliability
+
+- What makes multiple regression based study (w/ purpose of estimating a causal effect) reliable or unreliable?
+
+- **Internal validity:**  statistical inference valid for the population and setting studied
+
+- **External validity:** statistical inferences generalizes to other populations and settings
+
+## Threats to internal validity
+
+- Omitted variable bias
+
+- Misspecification of functional form
+
+- Errors-in-variables
+
+- Sample selection issues
+
+- Simultaneous causality
+
+- Heteroskedasticity
+
+- Correlation of errors across observations
+
+## Threats to external validity
+
+- Differences in populations
+
+  - Population studied vs. population of interest
+
+- Differences in settings
+
+  -  institutional, social, physical, and economic environment
+  
+- External validity myst be judged on a case-by-case basis using *specific* knowledge of the populations and settings studies and those of interest
+
+# External validity of test scores and class size analysis
+
+## Does CA results generalize to MA?
+
+- CA test score data
+
+  - Stanford 9 Achievement test of all 5th graders in CA 
+  
+  - Test score is average of reading and math
+  
+  - Unit of observation: CA K-6 and K-8 school district
+
+- MA elementary school testing data
+
+  - MCAS test of all 4th graders in MA public schools
+  
+  - Test score is sum of English, math, and science
+  
+  - Unit of observation: MA elementary school district
+
+## CA and MA school districts
+
+```{r, echo=TRUE, eval=TRUE, error=FALSE, warning=FALSE}
+library(AER) # Load Applied Econometrics with R library
+library(parameters) # Load parameters library 
+
+data(CASchools) # Load CASchools data
+# Generate a couple of useful variables
+CASchools$STR <- CASchools$students/CASchools$teachers  # Student-teacher ratio
+CASchools$Score <- (CASchools$read + CASchools$math)/2  # Student test score
+CASchools$HiEL <- as.numeric(CASchools$english > median(CASchools$english)) # Indicator for districts w/ above median English learners
+# Compute standardized CA score
+CASchools$Score.std <- (CASchools$Score - mean(CASchools$Score))/sd(CASchools$Score)  
+
+data(MASchools) # Load MASchools data
+# Generate a couple of useful variables
+MASchools$Score <- MASchools$score4 
+MASchools$STR <- MASchools$stratio
+MASchools$HiEL <- as.numeric(MASchools$english > median(MASchools$english)) # Indicator for districts w/ above median English learners
+# Compute standardized MAscore
+MASchools$Score.std <- (MASchools$Score - mean(MASchools$Score))/sd(MASchools$Score)  
+
+```
+
+## CA and MA school districts
+
+```{r, echo=TRUE, eval=TRUE, error=FALSE, warning=FALSE}
+# Table w/ descriptive statistics (Table 9.1 in Stock and Watson)
+vars <- c("Score","Score.std", "STR", "english", "lunch", "income")
+# Note: sapply() applies the function provided (e.g. mean) to every column of the data frame CASchools[, vars]; sapply() returns a vector
+# Note: cbind() binds sequence of vectors/matrices/dataframes by column
+dstat <- cbind(CA_mean = sapply(CASchools[, vars], mean),
+               CA_sd   = sapply(CASchools[, vars], sd),
+               MA_mean = sapply(MASchools[, vars], mean),
+               MA_sd   = sapply(MASchools[, vars], sd))
+round(dstat, digits = 2) # Print to console, round to 2 digits
+```
+
+## Standardized test scores and class size scatters
+
+```{r echo=FALSE, error=FALSE, warning=FALSE}
+plot(CASchools$STR,CASchools$Score.std,
+     xlab = "Student-teacher ratio", 
+     ylab = "Test score",
+     col = "blue",
+     xlim=c(10,30),
+     ylim=c(-4,4)) 
+points(MASchools$STR,MASchools$Score.std,
+     col = "red")
+# Add legends to the plot 
+legend("topright", inset = 0.02, 
+       legend=c("CA", "MA"),
+       col=c("blue", "red"), 
+       pch=c(1,1))
+```
+
+## Multiple regression analysis for CA and MA
+
+```{r, echo=TRUE, eval=TRUE, error=FALSE, warning=FALSE}
+# 6 regression models using CA data
+
+lm1.CA <- lm(Score.std ~ STR, data = CASchools)
+lm2.CA <- lm(Score.std ~ STR + english + lunch + log(income), data = CASchools)
+lm3.CA <- lm(Score.std ~ STR + english + lunch + income + 
+             I(income^2) + I(income^3), data = CASchools)
+lm4.CA <- lm(Score.std ~ STR + I(STR^2) + I(STR^3) + english + 
+             lunch + income + I(income^2) + I(income^3), data = CASchools)
+lm5.CA <- lm(Score.std ~ STR + I(income^2) + I(income^3) + 
+             HiEL:STR + lunch + income, data = CASchools)
+lm6.CA <- lm(Score.std ~ STR + I(income^2) + I(income^3) + 
+             HiEL + HiEL:STR + lunch + income, data = CASchools)
+
+# gather robust standard errors
+robSE.CA <- list(sqrt(diag(vcovHC(lm1.CA, type = "HC1"))),
+                 sqrt(diag(vcovHC(lm2.CA, type = "HC1"))),
+                 sqrt(diag(vcovHC(lm3.CA, type = "HC1"))),
+                 sqrt(diag(vcovHC(lm4.CA, type = "HC1"))),
+                 sqrt(diag(vcovHC(lm5.CA, type = "HC1"))),
+                 sqrt(diag(vcovHC(lm6.CA, type = "HC1"))))
+
+# 6 regression models using MA data
+
+lm1.MA <- lm(Score.std ~ STR, data = MASchools)
+lm2.MA <- lm(Score.std ~ STR + english + lunch + log(income), data = MASchools)
+lm3.MA <- lm(Score.std ~ STR + english + lunch + income + 
+             I(income^2) + I(income^3), data = MASchools)
+lm4.MA <- lm(Score.std ~ STR + I(STR^2) + I(STR^3) + english + 
+             lunch + income + I(income^2) + I(income^3), data = MASchools)
+lm5.MA <- lm(Score.std ~ STR + I(income^2) + I(income^3) + 
+             HiEL:STR + lunch + income, data = MASchools)
+lm6.MA <- lm(Score.std ~ STR + I(income^2) + I(income^3) + 
+             HiEL + HiEL:STR + lunch + income, data = MASchools)
+
+# gather robust standard errors
+robSE.MA <- list(sqrt(diag(vcovHC(lm1.MA, type = "HC1"))),
+                 sqrt(diag(vcovHC(lm2.MA, type = "HC1"))),
+                 sqrt(diag(vcovHC(lm3.MA, type = "HC1"))),
+                 sqrt(diag(vcovHC(lm4.MA, type = "HC1"))),
+                 sqrt(diag(vcovHC(lm5.MA, type = "HC1"))),
+                 sqrt(diag(vcovHC(lm6.MA, type = "HC1"))))
+
+```
+
+## Multiple regression analysis for CA and MA
+
+[Link to big table](https://moodle.royalholloway.ac.uk/pluginfile.php/1055941/mod_page/content/19/EC3133-lecture4-CA-MA-regs.html)
+
+## Nonlinear effect of class size on test scores in CA
+
+```{r, echo=TRUE, eval=TRUE, error=FALSE, warning=FALSE}
+# F-test for nonlinear effects of STR
+linearHypothesis(lm4.CA, c("I(STR^2)=0", "I(STR^3)=0"), white.adjust = "hc1")
+```
+
+## Nonlinear effect of class size on test scores in CA
+
+```{r echo=FALSE, error=FALSE, warning=FALSE}
+plot(CASchools$STR,CASchools$Score.std,
+     xlab = "Student-teacher ratio", 
+     ylab = "Test score",
+     col = "blue") 
+# data for use with predict()
+new.data.CA <- data.frame("STR" = seq(14, 26, 0.05), 
+                          "english" = mean(CASchools$english),
+                          "lunch" = mean(CASchools$lunch),
+                          "income" = mean(CASchools$income),
+                          "HiEL" = mean(CASchools$HiEL))
+# add estimated regression function for model III
+fitted.lm3.CA <- predict(lm3.CA, newdata = new.data.CA)
+lines(new.data.CA$STR, 
+      fitted.lm3.CA,
+      lwd = 3,
+      lty = 2,
+      col = "blue")
+# add estimated regression function for model IV
+fitted.lm4.CA <- predict(lm4.CA, newdata = new.data.CA)
+lines(new.data.CA$STR, 
+      fitted.lm4.CA,
+      lwd = 3,
+      col = "blue")
+# Add legends to the plot 
+legend("bottomright", inset = 0.02, 
+       legend=c("Linear (Model III)", "Cubic (Model IV)"),
+       col=c("blue", "blue"), 
+       lty=c(1,2),
+       lwd=c(3,3))
+
+cubicregfct.lm4.CA <- function(x){lm4.CA$coefficients["STR"]*x + lm4.CA$coefficients["I(STR^2)"]*x^2 + lm4.CA$coefficients["I(STR^3)"]*x^3}
+# cubicregfct.lm4.CA(20) - cubicregfct.lm4.CA(19)
+# cubicregfct.lm4.CA(18) - cubicregfct.lm4.CA(17)
+
+
+```
+
+
+## Preferred model for CA
+
+- Model IV has the highest adjusted $R^2$
+
+- Controlling for percentage of English learners and the economic background of the students cuts the effect of class size on test scores by a factor 3
+
+- Evidence of nonlinear effect of class size on test scores:
+
+  Model III (linear) implies a unit reduction of $STR$ increases $Score$ by 0.030 of a SD of $Score$, or $\approx$ 0.6 points.
+
+  Model IV (cubic) implies a unit reduction of $STR$ increases $Score$ by 0.061 of a SD of $Score$, or $\approx$ 1.16 points.
+
+## Nonlinear effect of class size on test scores in CA
+
+```{r, echo=TRUE, eval=TRUE, error=FALSE, warning=FALSE}
+# F-test for nonlinear effects of STR
+linearHypothesis(lm4.MA, c("I(STR^2)=0", "I(STR^3)=0"), white.adjust = "hc1")
+```
+
+## Preferred model for MA
+
+- Model III has the highest adjusted $R^2$
+
+- Controlling for percentage of English learners and the economic background of the students cuts the effect of class size on test scores by a factor 2.5
+
+- No evidence of nonlinear effect of class size on test scores:
+
+  Model III (linear) implies a unit reduction of $STR$ increases $Score$ by 0.042 of a SD of $Score$, or $\approx$ 0.635 points.
+
+## The effect of class size on test scores in CA and MA
+
+```{r echo=FALSE, error=FALSE, warning=FALSE}
+new.data.MA <- data.frame("STR" = seq(11, 27, 0.05), 
+                          "english" = mean(MASchools$english),
+                          "lunch" = mean(MASchools$lunch),
+                          "income" = mean(MASchools$income),
+                          "HiEL" = mean(MASchools$HiEL))
+fitted.lm3.MA <- predict(lm3.MA, newdata = new.data.MA)
+plot(CASchools$STR,CASchools$Score.std,
+     xlab = "Student-teacher ratio", 
+     ylab = "Test score",
+     col = "blue",
+     xlim=c(10,30),
+     ylim=c(-4,4)) 
+points(MASchools$STR,MASchools$Score.std,
+     col = "red")
+lines(new.data.CA$STR, 
+      fitted.lm4.CA,
+      lwd = 3,
+      col = "blue")
+lines(new.data.MA$STR, 
+      fitted.lm3.MA,
+      lwd = 3,
+      col = "red")
+# Add legends to the plot 
+legend("topright", inset = 0.02, 
+       legend=c("CA", "MA"),
+       col=c("blue", "red"), 
+       lwd=c(3,3))
+```
+
+## External validity of CA analysis (for MA)
+
+- *Ex ante* there were good reasons to be hopeful we could generalize CA results to MA 
+
+  - Same country (albeit a large one!)
+
+  - Similar curriculum/similar instruction
+  
+- *Ex ante* there were good reasons to be sceptical as well
+
+  - Demographic differences
+  
+  - Socio-economic differences
+  
+- On balance, our analysis of the MA data support external validity of the CA analysis (at least for MA)
+
+# Internal validity of test scores and class size analysis
+
+## Internal validity of CA analysis (for MA)
+
+- Omitted variable bias
+
+- Misspecification of functional form
+
+- Errors-in-variables
+
+- Sample selection issues
+
+- Simultaneous causality
+
+- Heteroskedasticity
+
+- Correlation of errors across observations
+
+# Summary
+
+## Summary
+
+- The reliability of multiple regression based study (w/ purpose of estimating a causal effect) depends on its
+
+  - Internal validity: statistical inference valid for the population and setting studied
+
+  - External validity: statistical inferences generalizes to other populations and settings
+  
+- Internal validity requires consistent/unbiased estimation of parameters and standard errors
+
+- External validity judged case-by-case using knowledge of population and settings studied and of interest

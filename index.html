@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <title>Assessing studies based on multiple regression</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="index_files/reveal.js-3.3.0.1/css/reveal.css"/>
+
+
+<style type="text/css">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="index_files/reveal.js-3.3.0.1/css/theme/solarized.css" id="theme">
+
+
+  <!-- some tweaks to reveal css -->
+  <style type="text/css">
+    .reveal h1 { font-size: 2.0em; }
+    .reveal h2 { font-size: 1.5em;  }
+    .reveal h3 { font-size: 1.25em;	}
+    .reveal h4 { font-size: 1em;	}
+
+    .reveal .slides>section,
+    .reveal .slides>section>section {
+      padding: 0px 0px;
+    }
+
+
+
+    .reveal table {
+      border-width: 1px;
+      border-spacing: 2px;
+      border-style: dotted;
+      border-color: gray;
+      border-collapse: collapse;
+      font-size: 0.7em;
+    }
+
+    .reveal table th {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      font-weight: bold;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+    .reveal table td {
+      border-width: 1px;
+      padding-left: 10px;
+      padding-right: 25px;
+      border-style: dotted;
+      border-color: gray;
+    }
+
+
+  </style>
+
+    <style type="text/css">code{white-space: pre;}</style>
+
+    <link rel="stylesheet" href="mystyle.css"/>
+
+<!-- Printing and PDF exports -->
+<script id="paper-css" type="application/dynamic-css">
+
+/* Default Print Stylesheet Template
+   by Rob Glazebrook of CSSnewbie.com
+   Last Updated: June 4, 2008
+
+   Feel free (nay, compelled) to edit, append, and
+   manipulate this file as you see fit. */
+
+
+@media print {
+
+	/* SECTION 1: Set default width, margin, float, and
+	   background. This prevents elements from extending
+	   beyond the edge of the printed page, and prevents
+	   unnecessary background images from printing */
+	html {
+		background: #fff;
+		width: auto;
+		height: auto;
+		overflow: visible;
+	}
+	body {
+		background: #fff;
+		font-size: 20pt;
+		width: auto;
+		height: auto;
+		border: 0;
+		margin: 0 5%;
+		padding: 0;
+		overflow: visible;
+		float: none !important;
+	}
+
+	/* SECTION 2: Remove any elements not needed in print.
+	   This would include navigation, ads, sidebars, etc. */
+	.nestedarrow,
+	.controls,
+	.fork-reveal,
+	.share-reveal,
+	.state-background,
+	.reveal .progress,
+	.reveal .backgrounds {
+		display: none !important;
+	}
+
+	/* SECTION 3: Set body font face, size, and color.
+	   Consider using a serif font for readability. */
+	body, p, td, li, div {
+		font-size: 20pt!important;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		color: #000;
+	}
+
+	/* SECTION 4: Set heading font face, sizes, and color.
+	   Differentiate your headings from your body text.
+	   Perhaps use a large sans-serif for distinction. */
+	h1,h2,h3,h4,h5,h6 {
+		color: #000!important;
+		height: auto;
+		line-height: normal;
+		font-family: Georgia, "Times New Roman", Times, serif !important;
+		text-shadow: 0 0 0 #000 !important;
+		text-align: left;
+		letter-spacing: normal;
+	}
+	/* Need to reduce the size of the fonts for printing */
+	h1 { font-size: 28pt !important;  }
+	h2 { font-size: 24pt !important; }
+	h3 { font-size: 22pt !important; }
+	h4 { font-size: 22pt !important; font-variant: small-caps; }
+	h5 { font-size: 21pt !important; }
+	h6 { font-size: 20pt !important; font-style: italic; }
+
+	/* SECTION 5: Make hyperlinks more usable.
+	   Ensure links are underlined, and consider appending
+	   the URL to the end of the link for usability. */
+	a:link,
+	a:visited {
+		color: #000 !important;
+		font-weight: bold;
+		text-decoration: underline;
+	}
+	/*
+	.reveal a:link:after,
+	.reveal a:visited:after {
+		content: " (" attr(href) ") ";
+		color: #222 !important;
+		font-size: 90%;
+	}
+	*/
+
+
+	/* SECTION 6: more reveal.js specific additions by @skypanther */
+	ul, ol, div, p {
+		visibility: visible;
+		position: static;
+		width: auto;
+		height: auto;
+		display: block;
+		overflow: visible;
+		margin: 0;
+		text-align: left !important;
+	}
+	.reveal pre,
+	.reveal table {
+		margin-left: 0;
+		margin-right: 0;
+	}
+	.reveal pre code {
+		padding: 20px;
+		border: 1px solid #ddd;
+	}
+	.reveal blockquote {
+		margin: 20px 0;
+	}
+	.reveal .slides {
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 0 !important;
+		zoom: 1 !important;
+
+		overflow: visible !important;
+		display: block !important;
+
+		text-align: left !important;
+		-webkit-perspective: none;
+		   -moz-perspective: none;
+		    -ms-perspective: none;
+		        perspective: none;
+
+		-webkit-perspective-origin: 50% 50%;
+		   -moz-perspective-origin: 50% 50%;
+		    -ms-perspective-origin: 50% 50%;
+		        perspective-origin: 50% 50%;
+	}
+	.reveal .slides section {
+		visibility: visible !important;
+		position: static !important;
+		width: auto !important;
+		height: auto !important;
+		display: block !important;
+		overflow: visible !important;
+
+		left: 0 !important;
+		top: 0 !important;
+		margin-left: 0 !important;
+		margin-top: 0 !important;
+		padding: 60px 20px !important;
+		z-index: auto !important;
+
+		opacity: 1 !important;
+
+		page-break-after: always !important;
+
+		-webkit-transform-style: flat !important;
+		   -moz-transform-style: flat !important;
+		    -ms-transform-style: flat !important;
+		        transform-style: flat !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+
+		-webkit-transition: none !important;
+		   -moz-transition: none !important;
+		    -ms-transition: none !important;
+		        transition: none !important;
+	}
+	.reveal .slides section.stack {
+		padding: 0 !important;
+	}
+	.reveal section:last-of-type {
+		page-break-after: avoid !important;
+	}
+	.reveal section .fragment {
+		opacity: 1 !important;
+		visibility: visible !important;
+
+		-webkit-transform: none !important;
+		   -moz-transform: none !important;
+		    -ms-transform: none !important;
+		        transform: none !important;
+	}
+	.reveal section img {
+		display: block;
+		margin: 15px 0px;
+		background: rgba(255,255,255,1);
+		border: 1px solid #666;
+		box-shadow: none;
+	}
+
+	.reveal section small {
+		font-size: 0.8em;
+	}
+
+}  
+</script>
+
+
+<script id="pdf-css" type="application/dynamic-css">
+    
+/**
+ * This stylesheet is used to print reveal.js
+ * presentations to PDF.
+ *
+ * https://github.com/hakimel/reveal.js#pdf-export
+ */
+
+* {
+	-webkit-print-color-adjust: exact;
+}
+
+body {
+	margin: 0 auto !important;
+	border: 0;
+	padding: 0;
+	float: none !important;
+	overflow: visible;
+}
+
+html {
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+}
+
+/* Remove any elements not needed in print. */
+.nestedarrow,
+.reveal .controls,
+.reveal .progress,
+.reveal .playback,
+.reveal.overview,
+.fork-reveal,
+.share-reveal,
+.state-background {
+	display: none !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	text-shadow: 0 0 0 #000 !important;
+}
+
+.reveal pre code {
+	overflow: hidden !important;
+	font-family: Courier, 'Courier New', monospace !important;
+}
+
+ul, ol, div, p {
+	visibility: visible;
+	position: static;
+	width: auto;
+	height: auto;
+	display: block;
+	overflow: visible;
+	margin: auto;
+}
+.reveal {
+	width: auto !important;
+	height: auto !important;
+	overflow: hidden !important;
+}
+.reveal .slides {
+	position: static;
+	width: 100%;
+	height: auto;
+
+	left: auto;
+	top: auto;
+	margin: 0 !important;
+	padding: 0 !important;
+
+	overflow: visible;
+	display: block;
+
+	-webkit-perspective: none;
+	   -moz-perspective: none;
+	    -ms-perspective: none;
+	        perspective: none;
+
+	-webkit-perspective-origin: 50% 50%; /* there isn't a none/auto value but 50-50 is the default */
+	   -moz-perspective-origin: 50% 50%;
+	    -ms-perspective-origin: 50% 50%;
+	        perspective-origin: 50% 50%;
+}
+
+.reveal .slides section {
+	page-break-after: always !important;
+
+	visibility: visible !important;
+	position: relative !important;
+	display: block !important;
+	position: relative !important;
+
+	margin: 0 !important;
+	padding: 0 !important;
+	box-sizing: border-box !important;
+	min-height: 1px;
+
+	opacity: 1 !important;
+
+	-webkit-transform-style: flat !important;
+	   -moz-transform-style: flat !important;
+	    -ms-transform-style: flat !important;
+	        transform-style: flat !important;
+
+	-webkit-transform: none !important;
+	   -moz-transform: none !important;
+	    -ms-transform: none !important;
+	        transform: none !important;
+}
+
+.reveal section.stack {
+	margin: 0 !important;
+	padding: 0 !important;
+	page-break-after: avoid !important;
+	height: auto !important;
+	min-height: auto !important;
+}
+
+.reveal img {
+	box-shadow: none;
+}
+
+.reveal .roll {
+	overflow: visible;
+	line-height: 1em;
+}
+
+/* Slide backgrounds are placed inside of their slide when exporting to PDF */
+.reveal section .slide-background {
+	display: block !important;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: -1;
+}
+
+/* All elements should be above the slide-background */
+.reveal section>* {
+	position: relative;
+	z-index: 1;
+}
+
+/* Display slide speaker notes when 'showNotes' is enabled */
+.reveal .speaker-notes-pdf {
+	display: block;
+	width: 100%;
+	max-height: none;
+	left: auto;
+	top: auto;
+	z-index: 100;
+}
+
+/* Display slide numbers when 'slideNumber' is enabled */
+.reveal .slide-number-pdf {
+	display: block;
+	position: absolute;
+	font-size: 14px;
+}
+
+</script>
+
+
+<script>
+var style = document.createElement( 'style' );
+style.type = 'text/css';
+var style_script_id = window.location.search.match( /print-pdf/gi ) ? 'pdf-css' : 'paper-css';
+var style_script = document.getElementById(style_script_id).text;
+style.innerHTML = style_script;
+document.getElementsByTagName('head')[0].appendChild(style);
+</script>
+
+    <link href="index_files/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+    <link href="index_files/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+
+<section class="slide level2">
+
+<section>
+<h1>
+Assessing studies based on multiple regression
+</h1>
+<p>Based on Stock and Watson, ch. 9</p>
+<p><br></p>
+<h2>
+<a href="mailto:jesper.bagger@rhul.ac.uk">Jesper Bagger</a>
+</h2>
+<h3>
+EC3133 | Royal Holloway | 2020/21
+</h3>
+</section>
+</section>
+<section><section id="internal-and-external-validity" class="title-slide slide level1"><h1>Internal and external validity</h1></section><section id="reliability" class="slide level2">
+<h2>Reliability</h2>
+<ul>
+<li><p>What makes multiple regression based study (w/ purpose of estimating a causal effect) reliable or unreliable?</p></li>
+<li><p><strong>Internal validity:</strong> statistical inference valid for the population and setting studied</p></li>
+<li><p><strong>External validity:</strong> statistical inferences generalizes to other populations and settings</p></li>
+</ul>
+</section><section id="threats-to-internal-validity" class="slide level2">
+<h2>Threats to internal validity</h2>
+<ul>
+<li><p>Omitted variable bias</p></li>
+<li><p>Misspecification of functional form</p></li>
+<li><p>Errors-in-variables</p></li>
+<li><p>Sample selection issues</p></li>
+<li><p>Simultaneous causality</p></li>
+<li><p>Heteroskedasticity</p></li>
+<li><p>Correlation of errors across observations</p></li>
+</ul>
+</section><section id="threats-to-external-validity" class="slide level2">
+<h2>Threats to external validity</h2>
+<ul>
+<li><p>Differences in populations</p>
+<ul>
+<li>Population studied vs. population of interest</li>
+</ul></li>
+<li><p>Differences in settings</p>
+<ul>
+<li>institutional, social, physical, and economic environment</li>
+</ul></li>
+<li><p>External validity myst be judged on a case-by-case basis using <em>specific</em> knowledge of the populations and settings studies and those of interest</p></li>
+</ul>
+</section></section>
+<section><section id="external-validity-of-test-scores-and-class-size-analysis" class="title-slide slide level1"><h1>External validity of test scores and class size analysis</h1></section><section id="does-ca-results-generalize-to-ma" class="slide level2">
+<h2>Does CA results generalize to MA?</h2>
+<ul>
+<li><p>CA test score data</p>
+<ul>
+<li><p>Stanford 9 Achievement test of all 5th graders in CA</p></li>
+<li><p>Test score is average of reading and math</p></li>
+<li><p>Unit of observation: CA K-6 and K-8 school district</p></li>
+</ul></li>
+<li><p>MA elementary school testing data</p>
+<ul>
+<li><p>MCAS test of all 4th graders in MA public schools</p></li>
+<li><p>Test score is sum of English, math, and science</p></li>
+<li><p>Unit of observation: MA elementary school district</p></li>
+</ul></li>
+</ul>
+</section><section id="ca-and-ma-school-districts" class="slide level2">
+<h2>CA and MA school districts</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(AER) <span class="co"># Load Applied Econometrics with R library</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(parameters) <span class="co"># Load parameters library </span></span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">data</span>(CASchools) <span class="co"># Load CASchools data</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="co"># Generate a couple of useful variables</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>CASchools<span class="op">$</span>STR &lt;-<span class="st"> </span>CASchools<span class="op">$</span>students<span class="op">/</span>CASchools<span class="op">$</span>teachers  <span class="co"># Student-teacher ratio</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>CASchools<span class="op">$</span>Score &lt;-<span class="st"> </span>(CASchools<span class="op">$</span>read <span class="op">+</span><span class="st"> </span>CASchools<span class="op">$</span>math)<span class="op">/</span><span class="dv">2</span>  <span class="co"># Student test score</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>CASchools<span class="op">$</span>HiEL &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(CASchools<span class="op">$</span>english <span class="op">&gt;</span><span class="st"> </span><span class="kw">median</span>(CASchools<span class="op">$</span>english)) <span class="co"># Indicator for districts w/ above median English learners</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="co"># Compute standardized CA score</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>CASchools<span class="op">$</span>Score.std &lt;-<span class="st"> </span>(CASchools<span class="op">$</span>Score <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(CASchools<span class="op">$</span>Score))<span class="op">/</span><span class="kw">sd</span>(CASchools<span class="op">$</span>Score)  </span>
+<span id="cb1-11"><a href="#cb1-11"></a></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="kw">data</span>(MASchools) <span class="co"># Load MASchools data</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="co"># Generate a couple of useful variables</span></span>
+<span id="cb1-14"><a href="#cb1-14"></a>MASchools<span class="op">$</span>Score &lt;-<span class="st"> </span>MASchools<span class="op">$</span>score4 </span>
+<span id="cb1-15"><a href="#cb1-15"></a>MASchools<span class="op">$</span>STR &lt;-<span class="st"> </span>MASchools<span class="op">$</span>stratio</span>
+<span id="cb1-16"><a href="#cb1-16"></a>MASchools<span class="op">$</span>HiEL &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(MASchools<span class="op">$</span>english <span class="op">&gt;</span><span class="st"> </span><span class="kw">median</span>(MASchools<span class="op">$</span>english)) <span class="co"># Indicator for districts w/ above median English learners</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="co"># Compute standardized MAscore</span></span>
+<span id="cb1-18"><a href="#cb1-18"></a>MASchools<span class="op">$</span>Score.std &lt;-<span class="st"> </span>(MASchools<span class="op">$</span>Score <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(MASchools<span class="op">$</span>Score))<span class="op">/</span><span class="kw">sd</span>(MASchools<span class="op">$</span>Score)  </span></code></pre></div>
+</section><section id="ca-and-ma-school-districts-1" class="slide level2">
+<h2>CA and MA school districts</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Table w/ descriptive statistics (Table 9.1 in Stock and Watson)</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Score&quot;</span>,<span class="st">&quot;Score.std&quot;</span>, <span class="st">&quot;STR&quot;</span>, <span class="st">&quot;english&quot;</span>, <span class="st">&quot;lunch&quot;</span>, <span class="st">&quot;income&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co"># Note: sapply() applies the function provided (e.g. mean) to every column of the data frame CASchools[, vars]; sapply() returns a vector</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># Note: cbind() binds sequence of vectors/matrices/dataframes by column</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>dstat &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dt">CA_mean =</span> <span class="kw">sapply</span>(CASchools[, vars], mean),</span>
+<span id="cb2-6"><a href="#cb2-6"></a>               <span class="dt">CA_sd   =</span> <span class="kw">sapply</span>(CASchools[, vars], sd),</span>
+<span id="cb2-7"><a href="#cb2-7"></a>               <span class="dt">MA_mean =</span> <span class="kw">sapply</span>(MASchools[, vars], mean),</span>
+<span id="cb2-8"><a href="#cb2-8"></a>               <span class="dt">MA_sd   =</span> <span class="kw">sapply</span>(MASchools[, vars], sd))</span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="kw">round</span>(dstat, <span class="dt">digits =</span> <span class="dv">2</span>) <span class="co"># Print to console, round to 2 digits</span></span></code></pre></div>
+<pre><code>##           CA_mean CA_sd MA_mean MA_sd
+## Score      654.16 19.05  709.83 15.13
+## Score.std    0.00  1.00    0.00  1.00
+## STR         19.64  1.89   17.34  2.28
+## english     15.77 18.29    1.12  2.90
+## lunch       44.71 27.12   15.32 15.06
+## income      15.32  7.23   18.75  5.81</code></pre>
+</section><section id="standardized-test-scores-and-class-size-scatters" class="slide level2">
+<h2>Standardized test scores and class size scatters</h2>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-4-1.png" /><!-- --></p>
+</section><section id="multiple-regression-analysis-for-ca-and-ma" class="slide level2">
+<h2>Multiple regression analysis for CA and MA</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># 6 regression models using CA data</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3"></a>lm1.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR, <span class="dt">data =</span> CASchools)</span>
+<span id="cb4-4"><a href="#cb4-4"></a>lm2.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span><span class="kw">log</span>(income), <span class="dt">data =</span> CASchools)</span>
+<span id="cb4-5"><a href="#cb4-5"></a>lm3.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="st">             </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>), <span class="dt">data =</span> CASchools)</span>
+<span id="cb4-7"><a href="#cb4-7"></a>lm4.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(STR<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(STR<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="st">             </span>lunch <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>), <span class="dt">data =</span> CASchools)</span>
+<span id="cb4-9"><a href="#cb4-9"></a>lm5.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="st">             </span>HiEL<span class="op">:</span>STR <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income, <span class="dt">data =</span> CASchools)</span>
+<span id="cb4-11"><a href="#cb4-11"></a>lm6.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="st">             </span>HiEL <span class="op">+</span><span class="st"> </span>HiEL<span class="op">:</span>STR <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income, <span class="dt">data =</span> CASchools)</span>
+<span id="cb4-13"><a href="#cb4-13"></a></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="co"># gather robust standard errors</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a>robSE.CA &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm1.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-16"><a href="#cb4-16"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm2.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-17"><a href="#cb4-17"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm3.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-18"><a href="#cb4-18"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm4.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-19"><a href="#cb4-19"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm5.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-20"><a href="#cb4-20"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm6.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))))</span>
+<span id="cb4-21"><a href="#cb4-21"></a></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co"># 6 regression models using MA data</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a></span>
+<span id="cb4-24"><a href="#cb4-24"></a>lm1.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR, <span class="dt">data =</span> MASchools)</span>
+<span id="cb4-25"><a href="#cb4-25"></a>lm2.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span><span class="kw">log</span>(income), <span class="dt">data =</span> MASchools)</span>
+<span id="cb4-26"><a href="#cb4-26"></a>lm3.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="st">             </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>), <span class="dt">data =</span> MASchools)</span>
+<span id="cb4-28"><a href="#cb4-28"></a>lm4.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(STR<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(STR<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="st">             </span>lunch <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>), <span class="dt">data =</span> MASchools)</span>
+<span id="cb4-30"><a href="#cb4-30"></a>lm5.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="st">             </span>HiEL<span class="op">:</span>STR <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income, <span class="dt">data =</span> MASchools)</span>
+<span id="cb4-32"><a href="#cb4-32"></a>lm6.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-33"><a href="#cb4-33"></a><span class="st">             </span>HiEL <span class="op">+</span><span class="st"> </span>HiEL<span class="op">:</span>STR <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income, <span class="dt">data =</span> MASchools)</span>
+<span id="cb4-34"><a href="#cb4-34"></a></span>
+<span id="cb4-35"><a href="#cb4-35"></a><span class="co"># gather robust standard errors</span></span>
+<span id="cb4-36"><a href="#cb4-36"></a>robSE.MA &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm1.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-37"><a href="#cb4-37"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm2.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-38"><a href="#cb4-38"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm3.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-39"><a href="#cb4-39"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm4.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-40"><a href="#cb4-40"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm5.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-41"><a href="#cb4-41"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm6.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))))</span></code></pre></div>
+</section><section id="multiple-regression-analysis-for-ca-and-ma-1" class="slide level2">
+<h2>Multiple regression analysis for CA and MA</h2>
+<p><a href="https://moodle.royalholloway.ac.uk/pluginfile.php/1055941/mod_page/content/19/EC3133-lecture4-CA-MA-regs.html">Link to big table</a></p>
+</section><section id="nonlinear-effect-of-class-size-on-test-scores-in-ca" class="slide level2">
+<h2>Nonlinear effect of class size on test scores in CA</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># F-test for nonlinear effects of STR</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="kw">linearHypothesis</span>(lm4.CA, <span class="kw">c</span>(<span class="st">&quot;I(STR^2)=0&quot;</span>, <span class="st">&quot;I(STR^3)=0&quot;</span>), <span class="dt">white.adjust =</span> <span class="st">&quot;hc1&quot;</span>)</span></code></pre></div>
+<pre><code>## Linear hypothesis test
+## 
+## Hypothesis:
+## I(STR^2) = 0
+## I(STR^3) = 0
+## 
+## Model 1: restricted model
+## Model 2: Score.std ~ STR + I(STR^2) + I(STR^3) + english + lunch + income + 
+##     I(income^2) + I(income^3)
+## 
+## Note: Coefficient covariance matrix supplied.
+## 
+##   Res.Df Df      F  Pr(&gt;F)  
+## 1    413                    
+## 2    411  2 3.4496 0.03268 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</section><section id="nonlinear-effect-of-class-size-on-test-scores-in-ca-1" class="slide level2">
+<h2>Nonlinear effect of class size on test scores in CA</h2>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-7-1.png" /><!-- --></p>
+</section><section id="preferred-model-for-ca" class="slide level2">
+<h2>Preferred model for CA</h2>
+<ul>
+<li><p>Model IV has the highest adjusted <span class="math inline">\(R^2\)</span></p></li>
+<li><p>Controlling for percentage of English learners and the economic background of the students cuts the effect of class size on test scores by a factor 3</p></li>
+<li><p>Evidence of nonlinear effect of class size on test scores:</p>
+<p>Model III (linear) implies a unit reduction of <span class="math inline">\(STR\)</span> increases <span class="math inline">\(Score\)</span> by 0.030 of a SD of <span class="math inline">\(Score\)</span>, or <span class="math inline">\(\approx\)</span> 0.6 points.</p>
+<p>Model IV (cubic) implies a unit reduction of <span class="math inline">\(STR\)</span> increases <span class="math inline">\(Score\)</span> by 0.061 of a SD of <span class="math inline">\(Score\)</span>, or <span class="math inline">\(\approx\)</span> 1.16 points.</p></li>
+</ul>
+</section><section id="nonlinear-effect-of-class-size-on-test-scores-in-ca-2" class="slide level2">
+<h2>Nonlinear effect of class size on test scores in CA</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># F-test for nonlinear effects of STR</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="kw">linearHypothesis</span>(lm4.MA, <span class="kw">c</span>(<span class="st">&quot;I(STR^2)=0&quot;</span>, <span class="st">&quot;I(STR^3)=0&quot;</span>), <span class="dt">white.adjust =</span> <span class="st">&quot;hc1&quot;</span>)</span></code></pre></div>
+<pre><code>## Linear hypothesis test
+## 
+## Hypothesis:
+## I(STR^2) = 0
+## I(STR^3) = 0
+## 
+## Model 1: restricted model
+## Model 2: Score.std ~ STR + I(STR^2) + I(STR^3) + english + lunch + income + 
+##     I(income^2) + I(income^3)
+## 
+## Note: Coefficient covariance matrix supplied.
+## 
+##   Res.Df Df      F Pr(&gt;F)
+## 1    213                 
+## 2    211  2 0.4463 0.6406</code></pre>
+</section><section id="preferred-model-for-ma" class="slide level2">
+<h2>Preferred model for MA</h2>
+<ul>
+<li><p>Model III has the highest adjusted <span class="math inline">\(R^2\)</span></p></li>
+<li><p>Controlling for percentage of English learners and the economic background of the students cuts the effect of class size on test scores by a factor 2.5</p></li>
+<li><p>No evidence of nonlinear effect of class size on test scores:</p>
+<p>Model III (linear) implies a unit reduction of <span class="math inline">\(STR\)</span> increases <span class="math inline">\(Score\)</span> by 0.042 of a SD of <span class="math inline">\(Score\)</span>, or <span class="math inline">\(\approx\)</span> 0.635 points.</p></li>
+</ul>
+</section><section id="the-effect-of-class-size-on-test-scores-in-ca-and-ma" class="slide level2">
+<h2>The effect of class size on test scores in CA and MA</h2>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-9-1.png" /><!-- --></p>
+</section><section id="external-validity-of-ca-analysis-for-ma" class="slide level2">
+<h2>External validity of CA analysis (for MA)</h2>
+<ul>
+<li><p><em>Ex ante</em> there were good reasons to be hopeful we could generalize CA results to MA</p>
+<ul>
+<li><p>Same country (albeit a large one!)</p></li>
+<li><p>Similar curriculum/similar instruction</p></li>
+</ul></li>
+<li><p><em>Ex ante</em> there were good reasons to be sceptical as well</p>
+<ul>
+<li><p>Demographic differences</p></li>
+<li><p>Socio-economic differences</p></li>
+</ul></li>
+<li><p>On balance, our analysis of the MA data support external validity of the CA analysis (at least for MA)</p></li>
+</ul>
+</section></section>
+<section><section id="internal-validity-of-test-scores-and-class-size-analysis" class="title-slide slide level1"><h1>Internal validity of test scores and class size analysis</h1></section><section id="internal-validity-of-ca-analysis-for-ma" class="slide level2">
+<h2>Internal validity of CA analysis (for MA)</h2>
+<ul>
+<li><p>Omitted variable bias</p></li>
+<li><p>Misspecification of functional form</p></li>
+<li><p>Errors-in-variables</p></li>
+<li><p>Sample selection issues</p></li>
+<li><p>Simultaneous causality</p></li>
+<li><p>Heteroskedasticity</p></li>
+<li><p>Correlation of errors across observations</p></li>
+</ul>
+</section></section>
+<section><section id="summary" class="title-slide slide level1"><h1>Summary</h1></section><section id="summary-1" class="slide level2">
+<h2>Summary</h2>
+<ul>
+<li><p>The reliability of multiple regression based study (w/ purpose of estimating a causal effect) depends on its</p>
+<ul>
+<li><p>Internal validity: statistical inference valid for the population and setting studied</p></li>
+<li><p>External validity: statistical inferences generalizes to other populations and settings</p></li>
+</ul></li>
+<li><p>Internal validity requires consistent/unbiased estimation of parameters and standard errors</p></li>
+<li><p>External validity judged case-by-case using knowledge of population and settings studied and of interest</p></li>
+</ul>
+</section></section>
+    </div>
+  </div>
+
+  <script src="index_files/reveal.js-3.3.0.1/lib/js/head.min.js"></script>
+  <script src="index_files/reveal.js-3.3.0.1/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        // Vertical centering of slides
+        center: true,
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+        // Transition style
+        transition: 'none', // none/fade/slide/convex/concave/zoom
+        // Transition style for full page slide backgrounds
+        backgroundTransition: 'none', // none/fade/slide/convex/concave/zoom
+
+        menu: {
+          numbers: true,
+          custom: false,
+          themes: false,
+          transitions: false
+        },
+
+
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'index_files/reveal.js-3.3.0.1/plugin/menu/menu.js', async: true },
+        ]
+      });
+    </script>
+  <!-- dynamically load mathjax for compatibility with self-contained -->
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
+<script>
+  (function() {
+    if (window.jQuery) {
+      Reveal.addEventListener( 'slidechanged', function(event) {  
+        window.jQuery(event.previousSlide).trigger('hidden');
+        window.jQuery(event.currentSlide).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+
+  </body>
+</html>
