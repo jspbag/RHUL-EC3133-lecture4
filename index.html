@@ -532,6 +532,16 @@ EC3133 | Royal Holloway | 2020/21
 </h3>
 </section>
 </section>
+<section><section id="graded-homework-i" class="title-slide slide level1"><h1>Graded homework I</h1></section><section id="graded-homework-i-1" class="slide level2">
+<h2>Graded homework I</h2>
+<ul>
+<li><p>Problem set 5 must be handed in by <strong>Monday, 09-11-2020 at 10:00am UK time</strong> (via turnitin on Moodle).</p></li>
+<li><p>Submit a neatly typeset Microsoft Word (.doc or .docx) or PDF document w/ your written answers.</p></li>
+<li><p>Submission clearly marked w/ candidate number or student ID. No names!</p></li>
+<li><p>Numerical answers must be accompanied by at least one sentence. Verbosity is penalized.</p></li>
+<li><p>Copy-paste your R-script into the bottom of your document. 20 mark penalty omitting the R-script.</p></li>
+</ul>
+</section></section>
 <section><section id="internal-and-external-validity" class="title-slide slide level1"><h1>Internal and external validity</h1></section><section id="reliability" class="slide level2">
 <h2>Reliability</h2>
 <ul>
@@ -559,7 +569,7 @@ EC3133 | Royal Holloway | 2020/21
 </ul></li>
 <li><p>Differences in settings</p>
 <ul>
-<li>institutional, social, physical, and economic environment</li>
+<li>Institutional, social, physical, and economic environment</li>
 </ul></li>
 <li><p>External validity myst be judged on a case-by-case basis using <em>specific</em> knowledge of the populations and settings studies and those of interest</p></li>
 </ul>
@@ -580,48 +590,44 @@ EC3133 | Royal Holloway | 2020/21
 <li><p>Unit of observation: MA elementary school district</p></li>
 </ul></li>
 </ul>
+</section><section id="standardized-test-scores" class="slide level2">
+<h2>Standardized test scores</h2>
+<ul>
+<li><p>To facilitate comparison between CA and MA test scores, we standardize them</p>
+<p><span class="math display">\[\widetilde{Score}_i^{CA} = \frac{Score_i^{CA} - \overline{Score}^{CA}}{SD(Score_i^{CA})}\]</span></p>
+<p><span class="math display">\[\widetilde{Score}_i^{MA} = \frac{Score_i^{MA} - \overline{Score}^{MA}}{SD(Score_i^{MA})}\]</span></p></li>
+<li><p>Compare effect of class size b/w CA and MA in term of the effect on test scores, measured in SD of these scores</p></li>
+</ul>
 </section><section id="ca-and-ma-school-districts" class="slide level2">
 <h2>CA and MA school districts</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(AER) <span class="co"># Load Applied Econometrics with R library</span></span></code></pre></div>
-<pre><code>## Loading required package: car</code></pre>
-<pre><code>## Loading required package: carData</code></pre>
-<pre><code>## Loading required package: lmtest</code></pre>
-<pre><code>## Loading required package: zoo</code></pre>
-<pre><code>## 
-## Attaching package: &#39;zoo&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     as.Date, as.Date.numeric</code></pre>
-<pre><code>## Loading required package: sandwich</code></pre>
-<pre><code>## Loading required package: survival</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">library</span>(parameters) <span class="co"># Load parameters library </span></span>
-<span id="cb10-2"><a href="#cb10-2"></a></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="kw">data</span>(CASchools) <span class="co"># Load CASchools data</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a><span class="co"># Generate a couple of useful variables</span></span>
-<span id="cb10-5"><a href="#cb10-5"></a>CASchools<span class="op">$</span>STR &lt;-<span class="st"> </span>CASchools<span class="op">$</span>students<span class="op">/</span>CASchools<span class="op">$</span>teachers  <span class="co"># Student-teacher ratio</span></span>
-<span id="cb10-6"><a href="#cb10-6"></a>CASchools<span class="op">$</span>Score &lt;-<span class="st"> </span>(CASchools<span class="op">$</span>read <span class="op">+</span><span class="st"> </span>CASchools<span class="op">$</span>math)<span class="op">/</span><span class="dv">2</span>  <span class="co"># Student test score</span></span>
-<span id="cb10-7"><a href="#cb10-7"></a>CASchools<span class="op">$</span>HiEL &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(CASchools<span class="op">$</span>english <span class="op">&gt;</span><span class="st"> </span><span class="kw">median</span>(CASchools<span class="op">$</span>english)) <span class="co"># Indicator for districts w/ above median English learners</span></span>
-<span id="cb10-8"><a href="#cb10-8"></a><span class="co"># Compute standardized CA score</span></span>
-<span id="cb10-9"><a href="#cb10-9"></a>CASchools<span class="op">$</span>Score.std &lt;-<span class="st"> </span>(CASchools<span class="op">$</span>Score <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(CASchools<span class="op">$</span>Score))<span class="op">/</span><span class="kw">sd</span>(CASchools<span class="op">$</span>Score)  </span>
-<span id="cb10-10"><a href="#cb10-10"></a></span>
-<span id="cb10-11"><a href="#cb10-11"></a><span class="kw">data</span>(MASchools) <span class="co"># Load MASchools data</span></span>
-<span id="cb10-12"><a href="#cb10-12"></a><span class="co"># Generate a couple of useful variables</span></span>
-<span id="cb10-13"><a href="#cb10-13"></a>MASchools<span class="op">$</span>Score &lt;-<span class="st"> </span>MASchools<span class="op">$</span>score4 </span>
-<span id="cb10-14"><a href="#cb10-14"></a>MASchools<span class="op">$</span>STR &lt;-<span class="st"> </span>MASchools<span class="op">$</span>stratio</span>
-<span id="cb10-15"><a href="#cb10-15"></a>MASchools<span class="op">$</span>HiEL &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(MASchools<span class="op">$</span>english <span class="op">&gt;</span><span class="st"> </span><span class="kw">median</span>(MASchools<span class="op">$</span>english)) <span class="co"># Indicator for districts w/ above median English learners</span></span>
-<span id="cb10-16"><a href="#cb10-16"></a><span class="co"># Compute standardized MAscore</span></span>
-<span id="cb10-17"><a href="#cb10-17"></a>MASchools<span class="op">$</span>Score.std &lt;-<span class="st"> </span>(MASchools<span class="op">$</span>Score <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(MASchools<span class="op">$</span>Score))<span class="op">/</span><span class="kw">sd</span>(MASchools<span class="op">$</span>Score)  </span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(AER) <span class="co"># Load Applied Econometrics with R library</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(parameters) <span class="co"># Load parameters library </span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">data</span>(CASchools) <span class="co"># Load CASchools data</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="co"># Generate a couple of useful variables</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>CASchools<span class="op">$</span>STR &lt;-<span class="st"> </span>CASchools<span class="op">$</span>students<span class="op">/</span>CASchools<span class="op">$</span>teachers  <span class="co"># Student-teacher ratio</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>CASchools<span class="op">$</span>Score &lt;-<span class="st"> </span>(CASchools<span class="op">$</span>read <span class="op">+</span><span class="st"> </span>CASchools<span class="op">$</span>math)<span class="op">/</span><span class="dv">2</span>  <span class="co"># Student test score</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>CASchools<span class="op">$</span>HiEL &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(CASchools<span class="op">$</span>english <span class="op">&gt;</span><span class="st"> </span><span class="kw">median</span>(CASchools<span class="op">$</span>english)) <span class="co"># Indicator for districts w/ above median English learners</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="co"># Compute standardized CA score</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a>CASchools<span class="op">$</span>Score.std &lt;-<span class="st"> </span>(CASchools<span class="op">$</span>Score <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(CASchools<span class="op">$</span>Score))<span class="op">/</span><span class="kw">sd</span>(CASchools<span class="op">$</span>Score)  </span>
+<span id="cb1-10"><a href="#cb1-10"></a></span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="kw">data</span>(MASchools) <span class="co"># Load MASchools data</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="co"># Generate a couple of useful variables</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a>MASchools<span class="op">$</span>Score &lt;-<span class="st"> </span>MASchools<span class="op">$</span>score4 </span>
+<span id="cb1-14"><a href="#cb1-14"></a>MASchools<span class="op">$</span>STR &lt;-<span class="st"> </span>MASchools<span class="op">$</span>stratio</span>
+<span id="cb1-15"><a href="#cb1-15"></a>MASchools<span class="op">$</span>HiEL &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(MASchools<span class="op">$</span>english <span class="op">&gt;</span><span class="st"> </span><span class="kw">median</span>(MASchools<span class="op">$</span>english)) <span class="co"># Indicator for districts w/ above median English learners</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a><span class="co"># Compute standardized MAscore</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a>MASchools<span class="op">$</span>Score.std &lt;-<span class="st"> </span>(MASchools<span class="op">$</span>Score <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(MASchools<span class="op">$</span>Score))<span class="op">/</span><span class="kw">sd</span>(MASchools<span class="op">$</span>Score)  </span></code></pre></div>
 </section><section id="ca-and-ma-school-districts-1" class="slide level2">
 <h2>CA and MA school districts</h2>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Table w/ descriptive statistics (Table 9.1 in Stock and Watson)</span></span>
-<span id="cb11-2"><a href="#cb11-2"></a>vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Score&quot;</span>,<span class="st">&quot;Score.std&quot;</span>, <span class="st">&quot;STR&quot;</span>, <span class="st">&quot;english&quot;</span>, <span class="st">&quot;lunch&quot;</span>, <span class="st">&quot;income&quot;</span>)</span>
-<span id="cb11-3"><a href="#cb11-3"></a><span class="co"># Note: sapply() applies the function provided (e.g. mean) to every column of the data frame CASchools[, vars]; sapply() returns a vector</span></span>
-<span id="cb11-4"><a href="#cb11-4"></a><span class="co"># Note: cbind() binds sequence of vectors/matrices/dataframes by column</span></span>
-<span id="cb11-5"><a href="#cb11-5"></a>dstat &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dt">CA_mean =</span> <span class="kw">sapply</span>(CASchools[, vars], mean),</span>
-<span id="cb11-6"><a href="#cb11-6"></a>               <span class="dt">CA_sd   =</span> <span class="kw">sapply</span>(CASchools[, vars], sd),</span>
-<span id="cb11-7"><a href="#cb11-7"></a>               <span class="dt">MA_mean =</span> <span class="kw">sapply</span>(MASchools[, vars], mean),</span>
-<span id="cb11-8"><a href="#cb11-8"></a>               <span class="dt">MA_sd   =</span> <span class="kw">sapply</span>(MASchools[, vars], sd))</span>
-<span id="cb11-9"><a href="#cb11-9"></a><span class="kw">round</span>(dstat, <span class="dt">digits =</span> <span class="dv">2</span>) <span class="co"># Print to console, round to 2 digits</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Table w/ descriptive statistics (Table 9.1 in Stock and Watson)</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Score&quot;</span>,<span class="st">&quot;Score.std&quot;</span>, <span class="st">&quot;STR&quot;</span>, <span class="st">&quot;english&quot;</span>, <span class="st">&quot;lunch&quot;</span>, <span class="st">&quot;income&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="co"># Note: sapply() applies the function provided (e.g. mean) to every column of the data frame CASchools[, vars]; sapply() returns a vector</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="co"># Note: cbind() binds sequence of vectors/matrices/dataframes by column</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>dstat &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dt">CA_mean =</span> <span class="kw">sapply</span>(CASchools[, vars], mean),</span>
+<span id="cb2-6"><a href="#cb2-6"></a>               <span class="dt">CA_sd   =</span> <span class="kw">sapply</span>(CASchools[, vars], sd),</span>
+<span id="cb2-7"><a href="#cb2-7"></a>               <span class="dt">MA_mean =</span> <span class="kw">sapply</span>(MASchools[, vars], mean),</span>
+<span id="cb2-8"><a href="#cb2-8"></a>               <span class="dt">MA_sd   =</span> <span class="kw">sapply</span>(MASchools[, vars], sd))</span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="kw">round</span>(dstat, <span class="dt">digits =</span> <span class="dv">2</span>) <span class="co"># Print to console, round to 2 digits</span></span></code></pre></div>
 <pre><code>##           CA_mean CA_sd MA_mean MA_sd
 ## Score      654.16 19.05  709.83 15.13
 ## Score.std    0.00  1.00    0.00  1.00
@@ -631,55 +637,55 @@ EC3133 | Royal Holloway | 2020/21
 ## income      15.32  7.23   18.75  5.81</code></pre>
 </section><section id="standardized-test-scores-and-class-size-scatters" class="slide level2">
 <h2>Standardized test scores and class size scatters</h2>
-<p><img data-src="index_files/figure-revealjs/unnamed-chunk-3-1.png" /><!-- --></p>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-4-1.png" /><!-- --></p>
 </section><section id="multiple-regression-analysis-for-ca-and-ma" class="slide level2">
 <h2>Multiple regression analysis for CA and MA</h2>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># Six regression models using CA data</span></span>
-<span id="cb13-2"><a href="#cb13-2"></a>lm1.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR, <span class="dt">data =</span> CASchools)</span>
-<span id="cb13-3"><a href="#cb13-3"></a>lm2.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span><span class="kw">log</span>(income), <span class="dt">data =</span> CASchools)</span>
-<span id="cb13-4"><a href="#cb13-4"></a>lm3.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span></span>
-<span id="cb13-5"><a href="#cb13-5"></a><span class="st">             </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>), <span class="dt">data =</span> CASchools)</span>
-<span id="cb13-6"><a href="#cb13-6"></a>lm4.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(STR<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(STR<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span></span>
-<span id="cb13-7"><a href="#cb13-7"></a><span class="st">             </span>lunch <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>), <span class="dt">data =</span> CASchools)</span>
-<span id="cb13-8"><a href="#cb13-8"></a>lm5.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb13-9"><a href="#cb13-9"></a><span class="st">             </span>HiEL<span class="op">:</span>STR <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income, <span class="dt">data =</span> CASchools)</span>
-<span id="cb13-10"><a href="#cb13-10"></a>lm6.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb13-11"><a href="#cb13-11"></a><span class="st">             </span>HiEL <span class="op">+</span><span class="st"> </span>HiEL<span class="op">:</span>STR <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income, <span class="dt">data =</span> CASchools)</span>
-<span id="cb13-12"><a href="#cb13-12"></a></span>
-<span id="cb13-13"><a href="#cb13-13"></a><span class="co"># gather robust standard errors</span></span>
-<span id="cb13-14"><a href="#cb13-14"></a>robSE.CA &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm1.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
-<span id="cb13-15"><a href="#cb13-15"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm2.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
-<span id="cb13-16"><a href="#cb13-16"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm3.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
-<span id="cb13-17"><a href="#cb13-17"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm4.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
-<span id="cb13-18"><a href="#cb13-18"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm5.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
-<span id="cb13-19"><a href="#cb13-19"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm6.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))))</span>
-<span id="cb13-20"><a href="#cb13-20"></a></span>
-<span id="cb13-21"><a href="#cb13-21"></a><span class="co"># Six regression models using MA data</span></span>
-<span id="cb13-22"><a href="#cb13-22"></a>lm1.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR, <span class="dt">data =</span> MASchools)</span>
-<span id="cb13-23"><a href="#cb13-23"></a>lm2.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span><span class="kw">log</span>(income), <span class="dt">data =</span> MASchools)</span>
-<span id="cb13-24"><a href="#cb13-24"></a>lm3.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span></span>
-<span id="cb13-25"><a href="#cb13-25"></a><span class="st">             </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>), <span class="dt">data =</span> MASchools)</span>
-<span id="cb13-26"><a href="#cb13-26"></a>lm4.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(STR<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(STR<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span></span>
-<span id="cb13-27"><a href="#cb13-27"></a><span class="st">             </span>lunch <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>), <span class="dt">data =</span> MASchools)</span>
-<span id="cb13-28"><a href="#cb13-28"></a>lm5.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb13-29"><a href="#cb13-29"></a><span class="st">             </span>HiEL<span class="op">:</span>STR <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income, <span class="dt">data =</span> MASchools)</span>
-<span id="cb13-30"><a href="#cb13-30"></a>lm6.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb13-31"><a href="#cb13-31"></a><span class="st">             </span>HiEL <span class="op">+</span><span class="st"> </span>HiEL<span class="op">:</span>STR <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income, <span class="dt">data =</span> MASchools)</span>
-<span id="cb13-32"><a href="#cb13-32"></a></span>
-<span id="cb13-33"><a href="#cb13-33"></a><span class="co"># gather robust standard errors</span></span>
-<span id="cb13-34"><a href="#cb13-34"></a>robSE.MA &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm1.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
-<span id="cb13-35"><a href="#cb13-35"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm2.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
-<span id="cb13-36"><a href="#cb13-36"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm3.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
-<span id="cb13-37"><a href="#cb13-37"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm4.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
-<span id="cb13-38"><a href="#cb13-38"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm5.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
-<span id="cb13-39"><a href="#cb13-39"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm6.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))))</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Six regression models using CA data</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>lm1.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR, <span class="dt">data =</span> CASchools)</span>
+<span id="cb4-3"><a href="#cb4-3"></a>lm2.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span><span class="kw">log</span>(income), <span class="dt">data =</span> CASchools)</span>
+<span id="cb4-4"><a href="#cb4-4"></a>lm3.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="st">             </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>), <span class="dt">data =</span> CASchools)</span>
+<span id="cb4-6"><a href="#cb4-6"></a>lm4.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(STR<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(STR<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="st">             </span>lunch <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>), <span class="dt">data =</span> CASchools)</span>
+<span id="cb4-8"><a href="#cb4-8"></a>lm5.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="st">             </span>HiEL<span class="op">:</span>STR <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income, <span class="dt">data =</span> CASchools)</span>
+<span id="cb4-10"><a href="#cb4-10"></a>lm6.CA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="st">             </span>HiEL <span class="op">+</span><span class="st"> </span>HiEL<span class="op">:</span>STR <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income, <span class="dt">data =</span> CASchools)</span>
+<span id="cb4-12"><a href="#cb4-12"></a></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co"># gather robust standard errors</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a>robSE.CA &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm1.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-15"><a href="#cb4-15"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm2.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-16"><a href="#cb4-16"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm3.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-17"><a href="#cb4-17"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm4.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-18"><a href="#cb4-18"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm5.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-19"><a href="#cb4-19"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm6.CA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))))</span>
+<span id="cb4-20"><a href="#cb4-20"></a></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co"># Six regression models using MA data</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a>lm1.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR, <span class="dt">data =</span> MASchools)</span>
+<span id="cb4-23"><a href="#cb4-23"></a>lm2.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span><span class="kw">log</span>(income), <span class="dt">data =</span> MASchools)</span>
+<span id="cb4-24"><a href="#cb4-24"></a>lm3.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-25"><a href="#cb4-25"></a><span class="st">             </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>), <span class="dt">data =</span> MASchools)</span>
+<span id="cb4-26"><a href="#cb4-26"></a>lm4.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(STR<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(STR<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span>english <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="st">             </span>lunch <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>), <span class="dt">data =</span> MASchools)</span>
+<span id="cb4-28"><a href="#cb4-28"></a>lm5.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="st">             </span>HiEL<span class="op">:</span>STR <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income, <span class="dt">data =</span> MASchools)</span>
+<span id="cb4-30"><a href="#cb4-30"></a>lm6.MA &lt;-<span class="st"> </span><span class="kw">lm</span>(Score.std <span class="op">~</span><span class="st"> </span>STR <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span><span class="kw">I</span>(income<span class="op">^</span><span class="dv">3</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="st">             </span>HiEL <span class="op">+</span><span class="st"> </span>HiEL<span class="op">:</span>STR <span class="op">+</span><span class="st"> </span>lunch <span class="op">+</span><span class="st"> </span>income, <span class="dt">data =</span> MASchools)</span>
+<span id="cb4-32"><a href="#cb4-32"></a></span>
+<span id="cb4-33"><a href="#cb4-33"></a><span class="co"># gather robust standard errors</span></span>
+<span id="cb4-34"><a href="#cb4-34"></a>robSE.MA &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm1.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-35"><a href="#cb4-35"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm2.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-36"><a href="#cb4-36"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm3.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-37"><a href="#cb4-37"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm4.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-38"><a href="#cb4-38"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm5.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))),</span>
+<span id="cb4-39"><a href="#cb4-39"></a>                 <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcovHC</span>(lm6.MA, <span class="dt">type =</span> <span class="st">&quot;HC1&quot;</span>))))</span></code></pre></div>
 </section><section id="multiple-regression-analysis-for-ca-and-ma-1" class="slide level2">
 <h2>Multiple regression analysis for CA and MA</h2>
 <p><a href="https://moodle.royalholloway.ac.uk/pluginfile.php/1055941/mod_page/content/19/EC3133-lecture4-CA-MA-regs.html">Link to big table</a></p>
 </section><section id="nonlinear-effect-of-class-size-on-test-scores-in-ca" class="slide level2">
 <h2>Nonlinear effect of class size on test scores in CA</h2>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># F-test for nonlinear effects of STR</span></span>
-<span id="cb14-2"><a href="#cb14-2"></a><span class="kw">linearHypothesis</span>(lm4.CA, <span class="kw">c</span>(<span class="st">&quot;I(STR^2)=0&quot;</span>, <span class="st">&quot;I(STR^3)=0&quot;</span>), <span class="dt">white.adjust =</span> <span class="st">&quot;hc1&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># F-test for nonlinear effects of STR</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="kw">linearHypothesis</span>(lm4.CA, <span class="kw">c</span>(<span class="st">&quot;I(STR^2)=0&quot;</span>, <span class="st">&quot;I(STR^3)=0&quot;</span>), <span class="dt">white.adjust =</span> <span class="st">&quot;hc1&quot;</span>)</span></code></pre></div>
 <pre><code>## Linear hypothesis test
 ## 
 ## Hypothesis:
@@ -699,20 +705,20 @@ EC3133 | Royal Holloway | 2020/21
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </section><section id="nonlinear-effect-of-class-size-on-test-scores-in-ca-1" class="slide level2">
 <h2>Nonlinear effect of class size on test scores in CA</h2>
-<p><img data-src="index_files/figure-revealjs/unnamed-chunk-6-1.png" /><!-- --></p>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-7-1.png" /><!-- --></p>
 </section><section id="preferred-model-for-ca" class="slide level2">
 <h2>Preferred model for CA</h2>
 <ul>
 <li><p>Model IV has the highest adjusted <span class="math inline">\(R^2\)</span></p></li>
 <li><p>Controlling for percentage of English learners and the economic background of the students cuts the effect of class size on test scores by a factor 3</p></li>
 <li><p>Evidence of nonlinear effect of class size on test scores:</p>
-<p>Model III (linear) implies a unit reduction of <span class="math inline">\(STR\)</span> increases <span class="math inline">\(Score\)</span> by 0.030 of a SD of <span class="math inline">\(Score\)</span>, or <span class="math inline">\(\approx\)</span> 0.6 points.</p>
-<p>Model IV (cubic) implies a unit reduction of <span class="math inline">\(STR\)</span> increases <span class="math inline">\(Score\)</span> by 0.061 of a SD of <span class="math inline">\(Score\)</span>, or <span class="math inline">\(\approx\)</span> 1.16 points.</p></li>
+<p>Model III implies a unit reduction of <span class="math inline">\(STR\)</span> increases <span class="math inline">\(Score\)</span> by 0.030 of a SD of <span class="math inline">\(Score\)</span>, or <span class="math inline">\(\approx\)</span> 0.6 points.</p>
+<p>Model IV implies a unit reduction of <span class="math inline">\(STR\)</span> increases <span class="math inline">\(Score\)</span> by 0.061 of a SD of <span class="math inline">\(Score\)</span>, or <span class="math inline">\(\approx\)</span> 1.16 points.</p></li>
 </ul>
 </section><section id="nonlinear-effect-of-class-size-on-test-scores-in-ca-2" class="slide level2">
 <h2>Nonlinear effect of class size on test scores in CA</h2>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># F-test for nonlinear effects of STR</span></span>
-<span id="cb16-2"><a href="#cb16-2"></a><span class="kw">linearHypothesis</span>(lm4.MA, <span class="kw">c</span>(<span class="st">&quot;I(STR^2)=0&quot;</span>, <span class="st">&quot;I(STR^3)=0&quot;</span>), <span class="dt">white.adjust =</span> <span class="st">&quot;hc1&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># F-test for nonlinear effects of STR</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="kw">linearHypothesis</span>(lm4.MA, <span class="kw">c</span>(<span class="st">&quot;I(STR^2)=0&quot;</span>, <span class="st">&quot;I(STR^3)=0&quot;</span>), <span class="dt">white.adjust =</span> <span class="st">&quot;hc1&quot;</span>)</span></code></pre></div>
 <pre><code>## Linear hypothesis test
 ## 
 ## Hypothesis:
@@ -734,22 +740,22 @@ EC3133 | Royal Holloway | 2020/21
 <li><p>Model III has the highest adjusted <span class="math inline">\(R^2\)</span></p></li>
 <li><p>Controlling for percentage of English learners and the economic background of the students cuts the effect of class size on test scores by a factor 2.5</p></li>
 <li><p>No evidence of nonlinear effect of class size on test scores:</p>
-<p>Model III (linear) implies a unit reduction of <span class="math inline">\(STR\)</span> increases <span class="math inline">\(Score\)</span> by 0.042 of a SD of <span class="math inline">\(Score\)</span>, or <span class="math inline">\(\approx\)</span> 0.635 points.</p></li>
+<p>Model III implies a unit reduction of <span class="math inline">\(STR\)</span> increases <span class="math inline">\(Score\)</span> by 0.042 of a SD of <span class="math inline">\(Score\)</span>, or <span class="math inline">\(\approx\)</span> 0.635 points.</p></li>
 </ul>
 </section><section id="the-effect-of-class-size-on-test-scores-in-ca-and-ma" class="slide level2">
 <h2>The effect of class size on test scores in CA and MA</h2>
-<p><img data-src="index_files/figure-revealjs/unnamed-chunk-8-1.png" /><!-- --></p>
+<p><img data-src="index_files/figure-revealjs/unnamed-chunk-9-1.png" /><!-- --></p>
 </section><section id="external-validity-of-ca-analysis-for-ma" class="slide level2">
 <h2>External validity of CA analysis (for MA)</h2>
 <ul>
 <li><p><em>Ex ante</em> there were good reasons to be hopeful we could generalize CA results to MA</p>
 <ul>
 <li><p>Same country (albeit a large one!)</p></li>
-<li><p>Similar curriculum/similar instruction</p></li>
+<li><p>Broadly similar curriculum/similar instruction</p></li>
 </ul></li>
 <li><p><em>Ex ante</em> there were good reasons to be sceptical as well</p>
 <ul>
-<li><p>Demographic differences</p></li>
+<li><p>Demographic and some institutional differences</p></li>
 <li><p>Socio-economic differences</p></li>
 </ul></li>
 <li><p>On balance, our analysis of the MA data support external validity of the CA analysis (at least for MA)</p></li>

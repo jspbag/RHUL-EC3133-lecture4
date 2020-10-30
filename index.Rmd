@@ -42,6 +42,43 @@ Based on Stock and Watson, ch. 9
 
 </section>
 
+```{r results='asis', echo=FALSE, include=FALSE}
+library(AER) # Load Applied Econometrics with R library
+library(parameters) # Load parameters library 
+
+data(CASchools) # Load CASchools data
+# Generate a couple of useful variables
+CASchools$STR <- CASchools$students/CASchools$teachers  # Student-teacher ratio
+CASchools$Score <- (CASchools$read + CASchools$math)/2  # Student test score
+CASchools$HiEL <- as.numeric(CASchools$english > median(CASchools$english)) # Indicator for districts w/ above median English learners
+# Compute standardized CA score
+CASchools$Score.std <- (CASchools$Score - mean(CASchools$Score))/sd(CASchools$Score)  
+
+data(MASchools) # Load MASchools data
+# Generate a couple of useful variables
+MASchools$Score <- MASchools$score4 
+MASchools$STR <- MASchools$stratio
+MASchools$HiEL <- as.numeric(MASchools$english > median(MASchools$english)) # Indicator for districts w/ above median English learners
+# Compute standardized MAscore
+MASchools$Score.std <- (MASchools$Score - mean(MASchools$Score))/sd(MASchools$Score)  
+```
+
+
+# Graded homework I
+
+## Graded homework I
+
+- Problem set 5 must be handed in by **Monday, 09-11-2020 at 10:00am UK time** (via turnitin on Moodle). 
+
+- Submit a neatly typeset Microsoft Word (.doc or .docx) or PDF document w/ your written answers.
+
+- Submission clearly marked w/ candidate number or student ID. No names!
+
+- Numerical answers must be accompanied by at least one sentence. Verbosity is penalized.
+
+- Copy-paste your R-script into the bottom of your document. 20 mark penalty omitting the R-script.
+
+
 # Internal and external validity
 
 ## Reliability
@@ -76,7 +113,7 @@ Based on Stock and Watson, ch. 9
 
 - Differences in settings
 
-  -  institutional, social, physical, and economic environment
+  - Institutional, social, physical, and economic environment
   
 - External validity myst be judged on a case-by-case basis using *specific* knowledge of the populations and settings studies and those of interest
 
@@ -100,12 +137,21 @@ Based on Stock and Watson, ch. 9
   
   - Unit of observation: MA elementary school district
 
+## Standardized test scores
+
+- To facilitate comparison between CA and MA test scores, we standardize them
+
+  $$\widetilde{Score}_i^{CA} = \frac{Score_i^{CA} - \overline{Score}^{CA}}{SD(Score_i^{CA})}$$
+
+  $$\widetilde{Score}_i^{MA} = \frac{Score_i^{MA} - \overline{Score}^{MA}}{SD(Score_i^{MA})}$$
+  
+- Compare effect of class size b/w CA and MA in term of the effect on test scores, measured in SD of these scores
+
 ## CA and MA school districts
 
-```{r, echo=TRUE, eval=TRUE, error=FALSE, warning=FALSE}
+```{r echo=TRUE, eval=FALSE}
 library(AER) # Load Applied Econometrics with R library
 library(parameters) # Load parameters library 
-
 data(CASchools) # Load CASchools data
 # Generate a couple of useful variables
 CASchools$STR <- CASchools$students/CASchools$teachers  # Student-teacher ratio
@@ -121,7 +167,6 @@ MASchools$STR <- MASchools$stratio
 MASchools$HiEL <- as.numeric(MASchools$english > median(MASchools$english)) # Indicator for districts w/ above median English learners
 # Compute standardized MAscore
 MASchools$Score.std <- (MASchools$Score - mean(MASchools$Score))/sd(MASchools$Score)  
-
 ```
 
 ## CA and MA school districts
@@ -143,7 +188,7 @@ round(dstat, digits = 2) # Print to console, round to 2 digits
 ```{r echo=FALSE, error=FALSE, warning=FALSE}
 plot(CASchools$STR,CASchools$Score.std,
      xlab = "Student-teacher ratio", 
-     ylab = "Test score",
+     ylab = "Standardized test score",
      col = "blue",
      xlim=c(10,30),
      ylim=c(-4,4)) 
@@ -216,7 +261,7 @@ linearHypothesis(lm4.CA, c("I(STR^2)=0", "I(STR^3)=0"), white.adjust = "hc1")
 ```{r echo=FALSE, error=FALSE, warning=FALSE}
 plot(CASchools$STR,CASchools$Score.std,
      xlab = "Student-teacher ratio", 
-     ylab = "Test score",
+     ylab = "Standardized test score",
      col = "blue") 
 # data for use with predict()
 new.data.CA <- data.frame("STR" = seq(14, 26, 0.05), 
@@ -258,9 +303,9 @@ cubicregfct.lm4.CA <- function(x){lm4.CA$coefficients["STR"]*x + lm4.CA$coeffici
 
 - Evidence of nonlinear effect of class size on test scores:
 
-  Model III (linear) implies a unit reduction of $STR$ increases $Score$ by 0.030 of a SD of $Score$, or $\approx$ 0.6 points.
+  Model III implies a unit reduction of $STR$ increases $Score$ by 0.030 of a SD of $Score$, or $\approx$ 0.6 points.
 
-  Model IV (cubic) implies a unit reduction of $STR$ increases $Score$ by 0.061 of a SD of $Score$, or $\approx$ 1.16 points.
+  Model IV implies a unit reduction of $STR$ increases $Score$ by 0.061 of a SD of $Score$, or $\approx$ 1.16 points.
 
 ## Nonlinear effect of class size on test scores in CA
 
@@ -277,7 +322,7 @@ linearHypothesis(lm4.MA, c("I(STR^2)=0", "I(STR^3)=0"), white.adjust = "hc1")
 
 - No evidence of nonlinear effect of class size on test scores:
 
-  Model III (linear) implies a unit reduction of $STR$ increases $Score$ by 0.042 of a SD of $Score$, or $\approx$ 0.635 points.
+  Model III implies a unit reduction of $STR$ increases $Score$ by 0.042 of a SD of $Score$, or $\approx$ 0.635 points.
 
 ## The effect of class size on test scores in CA and MA
 
@@ -290,7 +335,7 @@ new.data.MA <- data.frame("STR" = seq(11, 27, 0.05),
 fitted.lm3.MA <- predict(lm3.MA, newdata = new.data.MA)
 plot(CASchools$STR,CASchools$Score.std,
      xlab = "Student-teacher ratio", 
-     ylab = "Test score",
+     ylab = "Standardized test score",
      col = "blue",
      xlim=c(10,30),
      ylim=c(-4,4)) 
@@ -317,11 +362,11 @@ legend("topright", inset = 0.02,
 
   - Same country (albeit a large one!)
 
-  - Similar curriculum/similar instruction
+  - Broadly similar curriculum/similar instruction
   
 - *Ex ante* there were good reasons to be sceptical as well
 
-  - Demographic differences
+  - Demographic and some institutional differences
   
   - Socio-economic differences
   
